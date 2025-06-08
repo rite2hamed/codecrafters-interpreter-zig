@@ -170,7 +170,7 @@ fn scanToken(self: *Scanner) !Token {
 pub fn print(self: *Scanner) void {
     for (self.tokens.items) |token| {
         const label = std.enums.tagName(TokenType, token.tokenType);
-        std.debug.print("{s} {s} {s}\n", .{ label.?, token.lexeme, if (token.value) |v| v else "null" });
+        try std.io.getStdOut().writer().print("{s} {s} {s}\n", .{ label.?, token.lexeme, if (token.value) |v| v else "null" });
     }
 }
 fn scanToken_(self: *Scanner) !Token {
