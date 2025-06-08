@@ -29,7 +29,7 @@ pub fn main() !void {
         var scanner = Scanner.init(std.heap.page_allocator, file_contents);
         defer scanner.deinit();
         try scanner.scanTokens();
-        scanner.print();
+        try scanner.print();
     } else {
         try std.io.getStdOut().writer().print("EOF  null\n", .{}); // Placeholder, replace this line when implementing the scanner
     }
