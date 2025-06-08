@@ -1,4 +1,5 @@
 const std = @import("std");
+const Scanner = @import("./lox.zig");
 
 pub fn main() !void {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -25,7 +26,10 @@ pub fn main() !void {
 
     // Uncomment this block to pass the first stage.
     if (file_contents.len > 0) {
-        @panic("Scanner not implemented");
+        var scanner = Scanner.init(std.heap.page_allocator, file_contents);
+        defer scanner.deinit();
+        try scanner.scanTokens();
+        scanner.print();
     } else {
         try std.io.getStdOut().writer().print("EOF  null\n", .{}); // Placeholder, replace this line when implementing the scanner
     }
