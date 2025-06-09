@@ -180,6 +180,12 @@ fn scanToken(self: *Scanner) !Token {
         '!' => {
             return if (self.match('=')) Token.fromTokenTypeLexemeAndValue(.BANG_EQUAL, self.source[self.start..self.current], null) else Token.fromTokenTypeLexemeAndValue(.BANG, self.source[self.start..self.current], null);
         },
+        '>' => {
+            return if (self.match('=')) Token.fromTokenTypeLexemeAndValue(.GREATER_EQUAL, self.source[self.start..self.current], null) else Token.fromTokenTypeLexemeAndValue(.GREATER, self.source[self.start..self.current], null);
+        },
+        '<' => {
+            return if (self.match('=')) Token.fromTokenTypeLexemeAndValue(.LESS_EQUAL, self.source[self.start..self.current], null) else Token.fromTokenTypeLexemeAndValue(.LESS, self.source[self.start..self.current], null);
+        },
         else => {
             try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
             self.hadError = true;
