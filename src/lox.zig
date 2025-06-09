@@ -163,6 +163,9 @@ fn scanToken(self: *Scanner) !Token {
     return switch (c) {
         '(' => Token.fromTokenTypeLexemeAndValue(.LEFT_PAREN, self.source[self.start..self.current], null),
         ')' => Token.fromTokenTypeLexemeAndValue(.RIGHT_PAREN, self.source[self.start..self.current], null),
+        '{' => Token.fromTokenTypeLexemeAndValue(.LEFT_BRACE, self.source[self.start..self.current], null),
+        '}' => Token.fromTokenTypeLexemeAndValue(.RIGHT_BRACE, self.source[self.start..self.current], null),
+
         else => return LexerError.UnrecognizedToken,
     };
 }
