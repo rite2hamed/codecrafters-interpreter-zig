@@ -30,6 +30,9 @@ pub fn main() !void {
         defer scanner.deinit();
         try scanner.scanTokens();
         try scanner.print();
+        if (scanner.hadError) {
+            std.process.exit(65);
+        }
     } else {
         try std.io.getStdOut().writer().print("EOF  null\n", .{}); // Placeholder, replace this line when implementing the scanner
     }

@@ -81,6 +81,7 @@ tokens: std.ArrayList(Token),
 start: usize = 0,
 current: usize = 0,
 line: usize = 1,
+hadError: bool = false,
 
 const LexerError = error{
     UnrecognizedToken,
@@ -176,6 +177,7 @@ fn scanToken(self: *Scanner) !Token {
 
         else => {
             try std.io.getStdOut().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
+            self.hadError = true;
             return LexerError.UnrecognizedToken;
         },
     };
