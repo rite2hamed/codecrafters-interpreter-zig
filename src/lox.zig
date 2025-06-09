@@ -165,6 +165,12 @@ fn scanToken(self: *Scanner) !Token {
         ')' => Token.fromTokenTypeLexemeAndValue(.RIGHT_PAREN, self.source[self.start..self.current], null),
         '{' => Token.fromTokenTypeLexemeAndValue(.LEFT_BRACE, self.source[self.start..self.current], null),
         '}' => Token.fromTokenTypeLexemeAndValue(.RIGHT_BRACE, self.source[self.start..self.current], null),
+        ',' => Token.fromTokenTypeLexemeAndValue(.COMMA, self.source[self.start..self.current], null),
+        '.' => Token.fromTokenTypeLexemeAndValue(.DOT, self.source[self.start..self.current], null),
+        '-' => Token.fromTokenTypeLexemeAndValue(.MINUS, self.source[self.start..self.current], null),
+        '+' => Token.fromTokenTypeLexemeAndValue(.PLUS, self.source[self.start..self.current], null),
+        ';' => Token.fromTokenTypeLexemeAndValue(.SEMICOLON, self.source[self.start..self.current], null),
+        '*' => Token.fromTokenTypeLexemeAndValue(.STAR, self.source[self.start..self.current], null),
 
         else => return LexerError.UnrecognizedToken,
     };
