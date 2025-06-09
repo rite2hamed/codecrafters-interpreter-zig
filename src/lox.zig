@@ -129,7 +129,7 @@ pub fn scanTokens(self: *Scanner) !void {
         const token = self.scanToken() catch {
             continue;
         };
-        if (token.tokenType == .SLASH_SLASH) continue;
+        if (token.tokenType == .SLASH_SLASH or TokenType == .WHITE_SPACE) continue;
         try self.tokens.append(token);
     }
 
@@ -193,6 +193,11 @@ fn scanToken(self: *Scanner) !Token {
             }
             break :blk Token.fromTokenTypeLexemeAndValue(.SLASH_SLASH, self.source[self.start..self.current], null);
         } else Token.fromTokenTypeLexemeAndValue(.SLASH, self.source[self.start..self.current], null),
+        ' ', '\r', '\t' => Token.fromTokenTypeLexemeAndValue(.WHITE_SPACE, self.source[self.start..self.current], null),
+        '\n' => blk: {
+            self.line += 1;
+            break :blk Token.fromTokenTypeLexemeAndValue(.WHITE_SPACE, self.source[self.start..self.current], null);
+        },
         else => {
             try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
             self.hadError = true;
