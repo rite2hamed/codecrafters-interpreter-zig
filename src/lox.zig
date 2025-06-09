@@ -175,7 +175,7 @@ fn scanToken(self: *Scanner) !Token {
         '*' => Token.fromTokenTypeLexemeAndValue(.STAR, self.source[self.start..self.current], null),
 
         else => {
-            try std.io.getStdOut().writer().print("[line {d}] Error: Unexpected character: {c}", .{ self.line, c });
+            try std.io.getStdOut().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
             return LexerError.UnrecognizedToken;
         },
     };
