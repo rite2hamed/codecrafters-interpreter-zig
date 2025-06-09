@@ -125,7 +125,9 @@ fn isAtEnd(self: *Scanner) bool {
 pub fn scanTokens(self: *Scanner) !void {
     while (!self.isAtEnd()) {
         self.start = self.current;
-        const token = try self.scanToken();
+        const token = self.scanToken() catch {
+            continue;
+        };
         try self.tokens.append(token);
     }
 
