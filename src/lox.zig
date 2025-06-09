@@ -198,10 +198,19 @@ fn scanToken(self: *Scanner) !Token {
             self.line += 1;
             break :blk Token.fromTokenTypeLexemeAndValue(.WHITE_SPACE, self.source[self.start..self.current], null);
         },
-        else => {
-            try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
-            self.hadError = true;
-            return LexerError.UnrecognizedToken;
+        '"' => {
+            const s = try self.string();
+            return Token.fromTokenTypeLexemeAndValue(s, self.source[self.start..self.current], self.source[self.start + 1 .. self.current - 1]);
+        },
+        else => blk: {
+            if (std.ascii.isAlphabetic(c) or c == '_') {
+                const t = self.identifier();
+                break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], null);
+            } else {
+                try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
+                self.hadError = true;
+                return LexerError.UnrecognizedToken;
+            }
         },
     };
 }
@@ -261,14 +270,14 @@ fn scanToken_(self: *Scanner) !Token {
 fn string(self: *Scanner) LexerError!TokenType {
     while (self.peek() != '"' and !self.isAtEnd()) {
         if (self.peek() == '\n') self.line += 1;
-        self.advance();
+        _ = self.advance();
     }
 
     if (self.isAtEnd()) {
         return LexerError.UnterminatedString;
     }
 
-    self.advance();
+    _ = self.advance();
     return .STRING;
 }
 
@@ -285,7 +294,7 @@ fn isAlphaNumeric(c: u8) bool {
 }
 
 fn identifier(self: *Scanner) TokenType {
-    while (self.isAlphanumeric(self.peek())) _ = self.advance();
+    while (isAlphaNumeric(self.peek())) _ = self.advance();
     const ident = self.source[self.start..self.current];
     const tag = if (keywords.get(ident)) |tag| tag else .IDENTIFIER;
     return tag;
