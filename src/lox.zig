@@ -174,7 +174,9 @@ fn scanToken(self: *Scanner) !Token {
         '+' => Token.fromTokenTypeLexemeAndValue(.PLUS, self.source[self.start..self.current], null),
         ';' => Token.fromTokenTypeLexemeAndValue(.SEMICOLON, self.source[self.start..self.current], null),
         '*' => Token.fromTokenTypeLexemeAndValue(.STAR, self.source[self.start..self.current], null),
-
+        '=' => {
+            return if (self.match('=')) Token.fromTokenTypeLexemeAndValue(.EQUAL_EQUAL, self.source[self.start..self.current], null) else Token.fromTokenTypeLexemeAndValue(.EQUAL, self.source[self.start..self.current], null);
+        },
         else => {
             try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
             self.hadError = true;
