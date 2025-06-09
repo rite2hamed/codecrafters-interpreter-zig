@@ -129,7 +129,7 @@ pub fn scanTokens(self: *Scanner) !void {
         const token = self.scanToken() catch {
             continue;
         };
-        if (token.tokenType == .SLASH_SLASH or TokenType == .WHITE_SPACE) continue;
+        if (token.tokenType == .SLASH_SLASH or token.tokenType == .WHITE_SPACE) continue;
         try self.tokens.append(token);
     }
 
