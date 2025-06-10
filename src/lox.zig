@@ -284,6 +284,7 @@ fn string(self: *Scanner) !TokenType {
 
     if (self.isAtEnd()) {
         try err(self.line, "Unterminated string.");
+        self.hadError = true;
         return LexerError.UnterminatedString;
     }
 
