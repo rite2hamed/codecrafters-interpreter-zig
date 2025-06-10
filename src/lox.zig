@@ -207,12 +207,21 @@ fn scanToken(self: *Scanner) !Token {
                 const t = self.identifier();
                 break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], null);
             } else {
-                try std.io.getStdErr().writer().print("[line {d}] Error: Unexpected character: {c}\n", .{ self.line, c });
+                const character = [_]u8{c};
+                try err(self.line, "Unexpected character: " ++ &character);
                 self.hadError = true;
                 return LexerError.UnrecognizedToken;
             }
         },
     };
+}
+
+fn err(line: usize, message: []const u8) !void {
+    try report(line, "", message);
+}
+
+fn report(line: usize, where: []const u8, message: []const u8) !void {
+    try std.io.getStdErr().writer().print("[line {d}] Error{s}: {s}\n", .{ line, where, message });
 }
 
 pub fn print(self: *Scanner) !void {
@@ -267,13 +276,14 @@ fn scanToken_(self: *Scanner) !Token {
     return token;
 }
 
-fn string(self: *Scanner) LexerError!TokenType {
+fn string(self: *Scanner) !TokenType {
     while (self.peek() != '"' and !self.isAtEnd()) {
         if (self.peek() == '\n') self.line += 1;
         _ = self.advance();
     }
 
     if (self.isAtEnd()) {
+        try err(self.line, "Unterminated string.");
         return LexerError.UnterminatedString;
     }
 
