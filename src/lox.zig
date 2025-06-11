@@ -209,12 +209,18 @@ fn scanToken(self: *Scanner) !Token {
         else => blk: {
             if (std.ascii.isDigit(c)) {
                 const t = self.number();
-                const v = try std.fmt.parseFloat(f64, self.source[self.start..self.current]);
+                const raw = self.source[self.start..self.current];
+                const v = try std.fmt.parseFloat(f64, raw);
                 var buffer: [20]u8 = undefined;
-                const output = try std.fmt.bufPrint(&buffer, "{d:.1}", .{v});
+                const output = if (std.ascii.indexOfIgnoreCase(raw, ".")) |_|
+                    try std.fmt.bufPrint(&buffer, "{d}", .{v})
+                else
+                    try std.fmt.bufPrint(&buffer, "{d:.1}", .{v});
+
+                // const output = try std.fmt.bufPrint(&buffer, fmt, .{v});
                 const value = try self.allocator.dupe(u8, output);
                 // std.debug.print("raw: [{s}], v:{} output:{s}\n", .{ self.source[self.start..self.current], v, output });
-                break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], value);
+                break :blk Token.fromTokenTypeLexemeAndValue(t, raw, value);
             } else if (std.ascii.isAlphabetic(c) or c == '_') {
                 const t = self.identifier();
                 break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], null);
