@@ -116,6 +116,10 @@ pub fn init(allocator: std.mem.Allocator, source: []const u8) Scanner {
 }
 
 pub fn deinit(self: *Scanner) void {
+    for (self.tokens.items) |token| {
+        if (token.tokenType == .NUMBER)
+            self.allocator.free(token.value.?);
+    }
     self.tokens.deinit();
 }
 
@@ -203,7 +207,15 @@ fn scanToken(self: *Scanner) !Token {
             return Token.fromTokenTypeLexemeAndValue(s, self.source[self.start..self.current], self.source[self.start + 1 .. self.current - 1]);
         },
         else => blk: {
-            if (std.ascii.isAlphabetic(c) or c == '_') {
+            if (std.ascii.isDigit(c)) {
+                const t = self.number();
+                const v = try std.fmt.parseFloat(f64, self.source[self.start..self.current]);
+                var buffer: [20]u8 = undefined;
+                const output = try std.fmt.bufPrint(&buffer, "{d:.1}", .{v});
+                const value = try self.allocator.dupe(u8, output);
+                // std.debug.print("raw: [{s}], v:{} output:{s}\n", .{ self.source[self.start..self.current], v, output });
+                break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], value);
+            } else if (std.ascii.isAlphabetic(c) or c == '_') {
                 const t = self.identifier();
                 break :blk Token.fromTokenTypeLexemeAndValue(t, self.source[self.start..self.current], null);
             } else {
@@ -293,11 +305,12 @@ fn string(self: *Scanner) !TokenType {
 }
 
 fn number(self: *Scanner) TokenType {
-    while (std.ascii.isDigit(self.peek())) self.advance();
+    while (std.ascii.isDigit(self.peek())) _ = self.advance();
     if (self.peek() == '.' and std.ascii.isDigit(self.peekNext())) {
-        self.advance();
-        while (std.ascii.isDigit(self.peek())) self.advance();
+        _ = self.advance();
+        while (std.ascii.isDigit(self.peek())) _ = self.advance();
     }
+    return .NUMBER;
 }
 
 fn isAlphaNumeric(c: u8) bool {
