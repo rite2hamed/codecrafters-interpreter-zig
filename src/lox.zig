@@ -212,14 +212,15 @@ fn scanToken(self: *Scanner) !Token {
                 const raw = self.source[self.start..self.current];
                 const v = try std.fmt.parseFloat(f64, raw);
                 var buffer: [20]u8 = undefined;
-                const output = if (std.ascii.indexOfIgnoreCase(raw, ".")) |_|
+                var output = if (std.ascii.indexOfIgnoreCase(raw, ".")) |_|
                     try std.fmt.bufPrint(&buffer, "{d}", .{v})
                 else
                     try std.fmt.bufPrint(&buffer, "{d:.1}", .{v});
-
-                // const output = try std.fmt.bufPrint(&buffer, fmt, .{v});
+                if (std.ascii.indexOfIgnoreCase(output, ".")) |_| {} else {
+                    output = try std.fmt.bufPrint(&buffer, "{d:.1}", .{v});
+                }
                 const value = try self.allocator.dupe(u8, output);
-                // std.debug.print("raw: [{s}], v:{} output:{s}\n", .{ self.source[self.start..self.current], v, output });
+                // std.debug.print("raw: [{s}], v:{} output:{s}\n", .{ raw, v, output });
                 break :blk Token.fromTokenTypeLexemeAndValue(t, raw, value);
             } else if (std.ascii.isAlphabetic(c) or c == '_') {
                 const t = self.identifier();
