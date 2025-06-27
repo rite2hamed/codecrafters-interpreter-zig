@@ -96,7 +96,12 @@ fn primary(self: *Parser) ParserError!*Expr {
     if (self.match(&[_]TokenType{.TRUE})) return try self.createExpression(Expr.fromBoolean(true));
     if (self.match(&[_]TokenType{.NIL})) return try self.createExpression(Expr.fromNil());
     //todo convert to a number
-    if (self.match(&[_]TokenType{.NUMBER})) return try self.createExpression(Expr.fromNumber(0.0));
+    if (self.match(&[_]TokenType{.NUMBER})) {
+        const number: f64 = std.fmt.parseFloat(f64, self.previous().value.?) catch {
+            unreachable;
+        };
+        return try self.createExpression(Expr.fromNumber(number));
+    }
     if (self.match(&[_]TokenType{.STRING})) return try self.createExpression(Expr.fromString(self.previous().lexeme));
 
     if (self.match(&[_]TokenType{.LEFT_PAREN})) {
