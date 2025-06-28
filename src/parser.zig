@@ -102,7 +102,15 @@ fn primary(self: *Parser) ParserError!*Expr {
         };
         return try self.createExpression(Expr.fromNumber(number));
     }
-    if (self.match(&[_]TokenType{.STRING})) return try self.createExpression(Expr.fromString(self.previous().lexeme));
+    if (self.match(&[_]TokenType{.STRING})) {
+        const token = self.previous();
+        const value = if (token.value) |value|
+            value
+        else
+            token.lexeme;
+
+        return try self.createExpression(Expr.fromString(value));
+    }
 
     if (self.match(&[_]TokenType{.LEFT_PAREN})) {
         const expr = try self.expression();
