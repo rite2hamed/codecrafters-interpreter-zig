@@ -80,7 +80,8 @@ pub fn main() !void {
             std.process.exit(65);
         };
         const value = try Evaluator.evaluate(expr);
-        try value.format("", .{}, writer);
+        std.debug.print("{}\n", .{value});
+        try value.eval_format("", .{}, writer);
         try writer.writeByte('\n');
     }
 }
