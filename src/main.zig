@@ -5,6 +5,7 @@ const AstPrinter = @import("./ast.zig").AstPrinter;
 
 const TOKENIZE = "tokenize";
 const PARSE = "parse";
+const EVALUATE = "evaluate";
 
 pub fn main() !void {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -21,7 +22,7 @@ pub fn main() !void {
     const command = args[1];
     const filename = args[2];
 
-    const valid_commands = [_][]const u8{ TOKENIZE, PARSE };
+    const valid_commands = [_][]const u8{ TOKENIZE, PARSE, EVALUATE };
     var found = false;
     for (valid_commands) |valid_command| {
         found = std.mem.eql(u8, command, valid_command);
@@ -68,4 +69,17 @@ pub fn main() !void {
         };
         try AstPrinter.write(std.io.getStdOut().writer(), expr);
     }
+
+    if (std.mem.eql(u8, command, EVALUATE)) {
+        var parser = Parser.init(allocator, scanner.tokens.items);
+        defer parser.deinit();
+        const expr = parser.parseExpression() catch |err| {
+            std.debug.print("Error during parsing: {s}\n", .{@errorName(err)});
+            std.process.exit(65);
+        };
+        const value = try Evaluator.evaluate(expr);
+        std.debug.print("{}", .{value});
+    }
 }
+
+const Evaluator = @import("./evaluator.zig").Evaluator;
