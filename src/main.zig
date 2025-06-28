@@ -14,6 +14,8 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(std.heap.page_allocator);
     defer std.process.argsFree(std.heap.page_allocator, args);
 
+    const writer = std.io.getStdOut().writer();
+
     if (args.len < 3) {
         std.debug.print("Usage: ./your_program.sh tokenize <filename>\n", .{});
         std.process.exit(1);
@@ -67,7 +69,7 @@ pub fn main() !void {
             std.debug.print("Error during parsing: {s}\n", .{@errorName(err)});
             std.process.exit(65);
         };
-        try AstPrinter.write(std.io.getStdOut().writer(), expr);
+        try AstPrinter.write(writer, expr);
     }
 
     if (std.mem.eql(u8, command, EVALUATE)) {
@@ -78,7 +80,8 @@ pub fn main() !void {
             std.process.exit(65);
         };
         const value = try Evaluator.evaluate(expr);
-        std.debug.print("{}", .{value});
+        try value.format("", .{}, writer);
+        try writer.writeByte('\n');
     }
 }
 
