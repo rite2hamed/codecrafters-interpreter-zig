@@ -45,6 +45,26 @@ pub const Value = union(enum) {
         };
     }
 
+    pub fn add(self: *Value, other: Value) !Value {
+        return switch (self) {
+            .number => |left| switch (other) {
+                .number => |right| return Value.fromNumber(left + right),
+                else => error.TypeMismatch,
+            },
+            else => error.InvalidOperation,
+        };
+    }
+
+    pub fn subtract(self: *Value, other: Value) !Value {
+        return switch (self) {
+            .number => |left| switch (other) {
+                .number => |right| return Value.fromNumber(left - right),
+                else => error.TypeMismatch,
+            },
+            else => error.InvalidOperation,
+        };
+    }
+
     pub fn mulitply(self: Value, other: Value) !Value {
         return switch (self) {
             .number => |left| switch (other) {

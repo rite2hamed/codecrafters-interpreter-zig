@@ -53,6 +53,12 @@ pub fn evaluateBinary(self: *Interpreter, binary: BinaryExpr) Value {
             error.InvalidOperation, error.TypeMismatch => return self.reportError("Operands must be numbers.", .{}),
             error.DivideByZero => return self.reportError("Divide by zero", .{}),
         },
+        .MINUS => left.subtract(right) catch |err| switch (err) {
+            error.InvalidOperation, error.TypeMismatch => return self.reportError("Operands must be numbers.", .{}),
+        },
+        .PLUS => left.add(right) catch |err| switch (err) {
+            error.InvalidOperation, error.TypeMismatch => return self.reportError("Operands must be numbers.", .{}),
+        },
         else => return self.reportError("Unsupported binary operator: {s}", .{@tagName(binary.operator.tokenType)}),
     };
 }
