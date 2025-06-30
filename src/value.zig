@@ -45,7 +45,7 @@ pub const Value = union(enum) {
         };
     }
 
-    pub fn add(self: *Value, other: Value) !Value {
+    pub fn add(self: Value, other: Value) !Value {
         return switch (self) {
             .number => |left| switch (other) {
                 .number => |right| return Value.fromNumber(left + right),
@@ -55,7 +55,7 @@ pub const Value = union(enum) {
         };
     }
 
-    pub fn subtract(self: *Value, other: Value) !Value {
+    pub fn subtract(self: Value, other: Value) !Value {
         return switch (self) {
             .number => |left| switch (other) {
                 .number => |right| return Value.fromNumber(left - right),
