@@ -44,6 +44,29 @@ pub const Value = union(enum) {
             .number => |n| fromNumber(n),
         };
     }
+
+    pub fn mulitply(self: Value, other: Value) !Value {
+        return switch (self) {
+            .number => |left| switch (other) {
+                .number => |right| return Value.fromNumber(left * right),
+                else => error.TypeMismatch,
+            },
+            else => error.InvalidOperation,
+        };
+    }
+
+    pub fn divide(self: Value, other: Value) !Value {
+        return switch (self) {
+            .number => |left| switch (other) {
+                .number => |right| {
+                    if (right == 0) return error.DivideByZero;
+                    return Value.fromNumber(left / right);
+                },
+                else => error.TypeMismatch,
+            },
+            else => error.InvalidOperation,
+        };
+    }
 };
 
 const std = @import("std");

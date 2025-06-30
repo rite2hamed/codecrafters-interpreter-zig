@@ -43,9 +43,18 @@ fn reportError(self: *Interpreter, comptime fmt: []const u8, args: anytype) Valu
 }
 
 pub fn evaluateBinary(self: *Interpreter, binary: BinaryExpr) Value {
-    _ = self.evaluate(binary.left);
-    _ = self.evaluate(binary.right);
-    return Value.fromNil();
+    const left = self.evaluate(binary.left);
+    const right = self.evaluate(binary.right);
+    return switch (binary.operator.tokenType) {
+        .STAR => left.mulitply(right) catch |err| switch (err) {
+            error.InvalidOperation, error.TypeMismatch => return self.reportError("Operands must be numbers.", .{}),
+        },
+        .SLASH => left.divide(right) catch |err| switch (err) {
+            error.InvalidOperation, error.TypeMismatch => return self.reportError("Operands must be numbers.", .{}),
+            error.DivideByZero => return self.reportError("Divide by zero", .{}),
+        },
+        else => return self.reportError("Unsupported binary operator: {s}", .{@tagName(binary.operator.tokenType)}),
+    };
 }
 
 const std = @import("std");
