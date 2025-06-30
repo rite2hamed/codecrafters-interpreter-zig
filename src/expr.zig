@@ -160,20 +160,4 @@ pub const LiteralExpr = union(enum) {
             },
         }
     }
-
-    pub fn eval_format(
-        self: @This(),
-        comptime _: []const u8,
-        _: std.fmt.FormatOptions,
-        writer: anytype,
-    ) !void {
-        switch (self) {
-            .boolean => |b| try std.fmt.format(writer, "{}", .{b}),
-            .nil => try std.fmt.format(writer, "nil", .{}),
-            .string => |s| try std.fmt.format(writer, "{s}", .{s}),
-            .number => |n| {
-                try std.fmt.format(writer, "{d}", .{n});
-            },
-        }
-    }
 };

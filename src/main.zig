@@ -79,11 +79,11 @@ pub fn main() !void {
             std.debug.print("Error during parsing: {s}\n", .{@errorName(err)});
             std.process.exit(65);
         };
-        const value = try Evaluator.evaluate(expr);
-        std.debug.print("{}\n", .{value});
-        try value.eval_format("", .{}, writer);
+        var interpreter = Interpreter.init();
+        const value = interpreter.evaluate(expr);
+        try value.format("", .{}, writer);
         try writer.writeByte('\n');
     }
 }
 
-const Evaluator = @import("./evaluator.zig").Evaluator;
+const Interpreter = @import("./interpreter.zig");
